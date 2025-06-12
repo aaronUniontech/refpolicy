@@ -1,3 +1,9 @@
+refpolicy (2:2.20240723-2deepin15) unstable; urgency=medium
+
+  * feat: usec: 添加等保4策略
+
+ -- zhangya <zhangya@uniontech.com>  Thu, 12 Jun 2025 15:58:49 +0800
+
 refpolicy (2:2.20240723-2deepin14) unstable; urgency=medium
 
   * fix: usec: 禁止apt,dpkg_t域转换到deepin_immutable

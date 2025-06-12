@@ -1,0 +1,154 @@
+Index: refpolicy_commit/policy/modules/services/deepin_perm_control.if
+===================================================================
+--- refpolicy_commit.orig/policy/modules/services/deepin_perm_control.if
++++ refpolicy_commit/policy/modules/services/deepin_perm_control.if
+@@ -870,3 +870,73 @@ interface(`deepin_dbus_chat_deepin_login
+ 	allow $1 deepin_login_count_t:dbus send_msg;
+ 	allow deepin_login_count_t $1:dbus send_msg;
+ ')
++
++########################################
++## <summary>
++##  Send and receive messages from
++##  deepin-elf-verify over dbus.
++## </summary>
++## <param name="domain">
++##  <summary>
++##  Domain allowed access.
++##  </summary>
++## </param>
++#
++interface(`deepin_default_file_type',`
++	gen_require(`
++		attribute deepin_app_domain;
++        attribute deepin_executable_file_type;
++	')
++
++	allow deepin_app_domain $1:file *;
++    allow deepin_app_domain $1:dir *;
++    allow deepin_app_domain $1:lnk_file *;
++    allow deepin_app_domain $1:chr_file *;
++    allow deepin_app_domain $1:blk_file *;
++    allow deepin_app_domain $1:fifo_file *;
++    allow deepin_app_domain $1:sock_file *;
++    allow deepin_app_domain $1:socket *;
++    allow deepin_app_domain $1:tcp_socket *;
++    allow deepin_app_domain $1:udp_socket *;
++    allow deepin_app_domain $1:rawip_socket *;
++    allow deepin_app_domain $1:unix_stream_socket *;
++    allow deepin_app_domain $1:unix_dgram_socket *;
++    allow deepin_app_domain $1:sem *;
++    allow deepin_app_domain $1:msg *;
++    allow deepin_app_domain $1:msgq *;
++    allow deepin_app_domain $1:shm *;
++    allow deepin_app_domain $1:ipc *;
++    allow deepin_app_domain $1:fd *;
++    allow deepin_app_domain $1:key *;
++    allow deepin_app_domain $1:dbus *;
++    allow deepin_app_domain $1:system *;
++    allow deepin_app_domain $1:capability *;
++    allow deepin_app_domain $1:packet_socket *;
++    allow deepin_app_domain $1:bluetooth_socket *;
++
++    allow deepin_executable_file_type $1:file *;
++    allow deepin_executable_file_type $1:dir *;
++    allow deepin_executable_file_type $1:lnk_file *;
++    allow deepin_executable_file_type $1:chr_file *;
++    allow deepin_executable_file_type $1:blk_file *;
++    allow deepin_executable_file_type $1:fifo_file *;
++    allow deepin_executable_file_type $1:sock_file *;
++    allow deepin_executable_file_type $1:socket *;
++    allow deepin_executable_file_type $1:tcp_socket *;
++    allow deepin_executable_file_type $1:udp_socket *;
++    allow deepin_executable_file_type $1:rawip_socket *;
++    allow deepin_executable_file_type $1:unix_stream_socket *;
++    allow deepin_executable_file_type $1:unix_dgram_socket *;
++    allow deepin_executable_file_type $1:sem *;
++    allow deepin_executable_file_type $1:msg *;
++    allow deepin_executable_file_type $1:msgq *;
++    allow deepin_executable_file_type $1:shm *;
++    allow deepin_executable_file_type $1:ipc *;
++    allow deepin_executable_file_type $1:fd *;
++    allow deepin_executable_file_type $1:key *;
++    allow deepin_executable_file_type $1:dbus *;
++    allow deepin_executable_file_type $1:system *;
++    allow deepin_executable_file_type $1:capability *;
++    allow deepin_executable_file_type $1:packet_socket *;
++    allow deepin_executable_file_type $1:bluetooth_socket *;
++')
+Index: refpolicy_commit/policy/modules/services/deepin_perm_control.te
+===================================================================
+--- refpolicy_commit.orig/policy/modules/services/deepin_perm_control.te
++++ refpolicy_commit/policy/modules/services/deepin_perm_control.te
+@@ -270,6 +270,7 @@ ifdef(`enable_usec',`
+ 
+ 	allow deepin_usec_t apt_t:process  { ptrace signal sigkill sigstop };
+ 	allow deepin_usec_t dpkg_t:process { ptrace signal sigkill sigstop };
++	allow deepin_usec_t deepin_usec_t:capability2 *;
+ ')
+ 
+ # 注意, 这里由deepin_perm_manager_unit_t 保证服务不被stop就能防止通过systemctl stop来杀安全服务了
+@@ -407,6 +408,8 @@ allow deepin_executable_file_type deepin
+ 
+ allow deepin_executable_file_type self:file { exec_file_perms link execmod };
+ 
++deepin_default_file_type(unlabeled_t)
++
+ # Implement a blacklist mechanism
+ 
+ ########################################
+@@ -898,6 +901,51 @@ ifdef(`enable_usec',`
+ 	type deepin_unkillable_t;
+ 	deepin_app_domain_set(deepin_unkillable_t);
+ 	allow deepin_unkillable_t self:service *;
++    allow deepin_unkillable_t security_t:security *;
+ 	allow deepin_usec_t deepin_unkillable_t:process ~{ setcurrent setexec sigkill signal sigstop };
+ 	allow deepin_usec_t deepin_unkillable_t:service ~{ stop reload disable };
+-')
+\ No newline at end of file
++
++    allow deepin_usec_t security_t:security *;
++')
++
++type deepin_bin_t;
++deepin_default_file_type(deepin_bin_t)
++type deepin_etc_t;
++deepin_default_file_type(deepin_etc_t)
++type deepin_lib_t;
++deepin_default_file_type(deepin_lib_t)
++type deepin_default_t;
++deepin_default_file_type(deepin_default_t)
++type deepin_boot_t;
++deepin_default_file_type(deepin_boot_t)
++type deepin_lost_found_t;
++deepin_default_file_type(deepin_lost_found_t)
++type deepin_user_home_dir_t;
++deepin_default_file_type(deepin_user_home_dir_t)
++type deepin_tmp_t;
++deepin_default_file_type(deepin_tmp_t)
++type deepin_mnt_t;
++deepin_default_file_type(deepin_mnt_t)
++type deepin_usr_t;
++deepin_default_file_type(deepin_usr_t)
++type deepin_var_t;
++deepin_default_file_type(deepin_var_t)
++type deepin_man_t;
++deepin_default_file_type(deepin_man_t)
++type deepin_var_log_t;
++deepin_default_file_type(deepin_var_log_t)
++type deepin_recovery_t;
++deepin_default_file_type(deepin_recovery_t)
++
++type deepin_home_root_t;
++deepin_default_file_type(deepin_home_root_t)
++type deepin_home_auadm_t;
++deepin_default_file_type(deepin_home_auadm_t)
++type deepin_home_secadm_t;
++deepin_default_file_type(deepin_home_secadm_t)
++type deepin_home_sysadm_t;
++deepin_default_file_type(deepin_home_sysadm_t)
++type deepin_home_t;
++deepin_default_file_type(deepin_home_t)
++type deepin_root_t;
++deepin_default_file_type(deepin_root_t)
+\ No newline at end of file
